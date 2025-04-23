@@ -1,47 +1,26 @@
-// src/App.jsx
-import React, { useMemo } from 'react';
-import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
-import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
-import { PhantomWalletAdapter, SolflareWalletAdapter } from '@solana/wallet-adapter-wallets';
-import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
-import { clusterApiUrl } from '@solana/web3.js';
-
-// デフォルトスタイル（カスタマイズ可能）
-import '@solana/wallet-adapter-react-ui/styles.css';
-
-// コンポーネントのインポート
+import React, { useState } from 'react';
+import Loader from './components/Loader';
 import Header from './components/Header';
 import SwapInterface from './components/SwapInterface';
-import './App.css';
+import { StaggeredContainer } from './components/Animations';
+import './index.css';
 
-function App() {
-  // ネットワークはdevnet、testnet、mainnet-betaに設定可能
-  const network = WalletAdapterNetwork.Devnet;
-  
-  // RPC エンドポイントの設定
-  const endpoint = useMemo(() => clusterApiUrl(network), [network]);
-  
-  // サポートするウォレットのリスト
-  const wallets = useMemo(
-    () => [
-      new PhantomWalletAdapter(),
-      new SolflareWalletAdapter(),
-    ],
-    [network]
-  );
+export default function App() {
+  const [loading, setLoading] = useState(true);
 
   return (
-    <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect>
-        <WalletModalProvider>
-          <div className="app">
-            <Header />
-            <SwapInterface />
+    <>  
+      {loading && <Loader onFinish={() => setLoading(false)} />}
+      {!loading && (
+        <div className="pt-20">  {/* Header 固定分を考慮 */}
+          <Header />
+          <div className="max-w-xl mx-auto mt-12 space-y-8">
+            <StaggeredContainer>
+              <SwapInterface />
+            </StaggeredContainer>
           </div>
-        </WalletModalProvider>
-      </WalletProvider>
-    </ConnectionProvider>
+        </div>
+      )}
+    </>
   );
 }
-
-export default App;

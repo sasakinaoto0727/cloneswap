@@ -1,21 +1,10 @@
-/* src/components/Header.css */
-.header {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 2rem;
-  background-color: #191b1f;
-}
-
-.title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: white;
-  margin: 0;
-}
-
 .wallet-button-container {
+  /* Uniswap と同じサイズ感 */
+  height: 2.5rem;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 1.25rem;  /* 角丸 */
+  padding: 0.25rem 0.75rem;
   display: flex;
   align-items: center;
+  backdrop-filter: blur(10px);
 }

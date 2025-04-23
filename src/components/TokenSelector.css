@@ -1,0 +1,4 @@
+.token-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; cursor: pointer; }
+.token-logo { width: 1.5rem; height: 1.5rem; }
+.token-symbol { color: white; }
+.token-item:hover { background-color: rgba(255, 255, 255, 0.1); }
