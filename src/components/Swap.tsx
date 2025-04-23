@@ -1,57 +1,40 @@
 import React, { useState } from 'react';
+import './Swap.css';
 
-export default function Swap() {
-  const [fromValue, setFromValue] = useState('');
-  const [toValue, setToValue] = useState('');
+const Swap: React.FC = () => {
+  const [sellAmount, setSellAmount] = useState('');
+  const [buyAmount, setBuyAmount] = useState('');
+
+  const handlePercentageClick = (percentage: number) => {
+    // ここに資産総量の計算ロジックを実装
+    // 例：資産総量が100の場合
+    const totalAsset = 100;
+    setSellAmount((totalAsset * percentage).toString());
+  };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white rounded shadow">
-      <h2 className="text-2xl font-bold mb-4 text-center">Swap</h2>
-      
-      {/* From セクション */}
-      <div className="mb-4">
-        <label className="block text-gray-700 mb-1">From</label>
-        <div className="flex space-x-2">
-          <select className="border p-2 rounded">
-            <option>ETH</option>
-            <option>DAI</option>
-            <option>USDC</option>
-          </select>
-          <input
-            type="number"
-            value={fromValue}
-            onChange={(e) => setFromValue(e.target.value)}
-            className="flex-1 border p-2 rounded"
-            placeholder="0.0"
-          />
-        </div>
-      </div>
+    <div className="swap-container">
+      <h2>売却</h2>
+      <input
+        type="number"
+        value={sellAmount}
+        onChange={(e) => setSellAmount(e.target.value)}
+        placeholder="売却額"
+      />
+      <button onClick={() => handlePercentageClick(0.25)}>25%</button>
+      <button onClick={() => handlePercentageClick(0.5)}>50%</button>
+      <button onClick={() => handlePercentageClick(0.75)}>75%</button>
+      <button onClick={() => handlePercentageClick(1)}>最大</button>
 
-      {/* Swap ボタン */}
-      <div className="flex justify-center mb-4">
-        <button className="bg-green-500 text-white px-4 py-2 rounded font-bold">
-          Swap
-        </button>
-      </div>
-
-      {/* To セクション */}
-      <div>
-        <label className="block text-gray-700 mb-1">To</label>
-        <div className="flex space-x-2">
-          <select className="border p-2 rounded">
-            <option>ETH</option>
-            <option>DAI</option>
-            <option>USDC</option>
-          </select>
-          <input
-            type="number"
-            value={toValue}
-            onChange={(e) => setToValue(e.target.value)}
-            className="flex-1 border p-2 rounded"
-            placeholder="0.0"
-          />
-        </div>
-      </div>
+      <h2>購入</h2>
+      <input
+        type="number"
+        value={buyAmount}
+        onChange={(e) => setBuyAmount(e.target.value)}
+        placeholder="購入額"
+      />
     </div>
   );
-}
+};
+
+export default Swap;

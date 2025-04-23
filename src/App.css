@@ -40,3 +40,8 @@
 .read-the-docs {
   color: #888;
 }
+body {
+  background-image: url('/bg-pattern.svg'); /* パスを修正 */
+  background-repeat: repeat;
+  background-attachment: fixed;
+}

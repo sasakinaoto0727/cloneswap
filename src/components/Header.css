@@ -1,0 +1,21 @@
+/* src/components/Header.css */
+.header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: #191b1f;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+}
+
+.wallet-button-container {
+  display: flex;
+  align-items: center;
+}
