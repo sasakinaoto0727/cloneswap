@@ -1,3 +1,78 @@
-.swap-card { display: flex; flex-direction: column; gap: 1rem; }
-.proceed-button { background: #646cff; color: white; padding: 0.75rem; border-radius: 0.75rem; }
-.swap-confirm-button { background: #fab400; color: black; padding: 0.75rem; border-radius: 0.75rem; }
+.swap-card-large {
+  max-width: 600px;
+  width: 100%;
+  margin: 2rem auto;
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 1rem;
+  padding: 2rem;
+  box-sizing: border-box;
+  color: #fff;
+}
+
+.swap-title {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+/* ボックス共通 */
+.swap-box {
+  border: 1px solid #444;
+  border-radius: 0.75rem;
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+/* ヘッダー */
+.box-header {
+  background: #222;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  font-weight: bold;
+}
+
+/* 本体 */
+.box-body {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+}
+.swap-input {
+  flex: 1;
+  padding: 0.75rem;
+  background: transparent;
+  border: 1px solid #555;
+  border-radius: 0.5rem;
+  color: #fff;
+  font-size: 1rem;
+}
+
+/* フッター */
+.box-footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  font-size: 0.75rem;
+  color: #aaa;
+}
+.box-footer .usd {
+  font-weight: bold;
+}
+
+/* 実行ボタン */
+.swap-button-large {
+  width: 100%;
+  padding: 1rem;
+  background: #3b82f6;
+  border: none;
+  border-radius: 0.75rem;
+  font-size: 1.125rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 1rem;
+}
+.swap-button-large:hover {
+  background: #2563eb;
+}

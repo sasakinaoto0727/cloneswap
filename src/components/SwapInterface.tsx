@@ -1,30 +1,75 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import TokenSelector from './TokenSelector';
+import React, { useState, useEffect } from 'react';
+import TokenSelector, { Token } from './TokenSelector';
 import './SwapInterface.css';
 
-export default function SwapInterface() {
-  const [step, setStep] = useState(0);
+// ダミー残高と価格（後でAPIから取得）
+const FAKE_BALANCES: Record<string, number> = { ETH: 2.5, USDC: 1000, SOL: 10 };
+const FAKE_PRICES:   Record<string, number> = { ETH: 4200, USDC: 1,   SOL: 180 };
 
-  const next = () => setStep(prev => Math.min(prev + 1, 2));
+export default function SwapInterface() {
+  const [fromToken, setFromToken] = useState<Token>({ symbol: 'ETH',  logoUrl: '/token-logos/eth.svg' });
+  const [toToken,   setToToken]   = useState<Token>({ symbol: 'USDC', logoUrl: '/token-logos/usdc.svg' });
+  const [fromValue, setFromValue] = useState<string>('');
+  const [toValue,   setToValue]   = useState<string>('');
+
+  // 残高とドル換算
+  const fromBalance = FAKE_BALANCES[fromToken.symbol] || 0;
+  const fromUSD     = (Number(fromValue || 0) * (FAKE_PRICES[fromToken.symbol] || 0)).toFixed(2);
+
+  // 入力変更時にドル換算を更新
+  const onFromChange = (v: string) => {
+    setFromValue(v);
+    // 擬似的にレート1:1と仮定
+    setToValue(v);
+  };
 
   return (
-    <div className="swap-card p-6 bg-black/70 rounded-2xl backdrop-blur-lg">
-      {step === 0 && (
-        <motion.div initial={{ x: -50, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.5 }}>
-          <button onClick={next} className="proceed-button">Start Swap</button>
-        </motion.div>
-      )}
-      {step >= 1 && (
-        <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.2 }}>
-          <TokenSelector />
-        </motion.div>
-      )}
-      {step === 2 && (
-        <motion.button onClick={next} className="swap-confirm-button" whileTap={{ scale: 0.95 }}>
-          Confirm Swap
-        </motion.button>
-      )}
+    <div className="swap-card-large">
+      <h2 className="swap-title">Swap</h2>
+
+      {/* From ボックス */}
+      <div className="swap-box">
+        <div className="box-header">From</div>
+        <div className="box-body">
+          <input
+            type="number"
+            className="swap-input"
+            placeholder="0.0"
+            value={fromValue}
+            onChange={e => onFromChange(e.target.value)}
+          />
+          <TokenSelector selected={fromToken} onSelect={setFromToken} />
+        </div>
+        <div className="box-footer">
+          <span className="balance">Balance: {fromBalance} {fromToken.symbol}</span>
+          <span className="usd">≈ ${fromUSD}</span>
+        </div>
+      </div>
+
+      {/* To ボックス */}
+      <div className="swap-box">
+        <div className="box-header">To</div>
+        <div className="box-body">
+          <input
+            type="number"
+            className="swap-input"
+            placeholder="0.0"
+            value={toValue}
+            onChange={e => setToValue(e.target.value)}
+          />
+          <TokenSelector selected={toToken} onSelect={setToToken} />
+        </div>
+        <div className="box-footer">
+          <span className="balance">
+            Balance: {FAKE_BALANCES[toToken.symbol] || 0} {toToken.symbol}
+          </span>
+          <span className="usd">
+            ≈ ${(Number(toValue || 0) * (FAKE_PRICES[toToken.symbol] || 0)).toFixed(2)}
+          </span>
+        </div>
+      </div>
+
+      <button className="swap-button-large">Swap</button>
     </div>
   );
 }

@@ -1,22 +1,22 @@
-import { ReactNode } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
+import React from "react";
 
-// 子要素を順々に出すコンテナ
-export const StaggeredContainer = ({ children }: { children: ReactNode }) => {
-  const container = {
-    hidden: {},
-    visible: { transition: { staggerChildren: 0.3 } }
-  };
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100 } }
-  };
-
+export const StaggeredContainer = ({ children }: { children: React.ReactNode }) => {
   return (
-    <motion.div variants={container} initial="hidden" animate="visible">
-      {React.Children.map(children, child => (
-        <motion.div variants={item}>{child}</motion.div>
-      ))}
+    <motion.div
+      initial="hidden"
+      animate="show"
+      variants={{
+        hidden: { opacity: 0 },
+        show: {
+          opacity: 1,
+          transition: {
+            staggerChildren: 0.2
+          }
+        }
+      }}
+    >
+      {children}
     </motion.div>
   );
 };
