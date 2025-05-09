@@ -1,74 +1,57 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useEffect, useState } from 'react';
+import { Connection, PublicKey } from '@solana/web3.js';
+import { fetchTokenBalance } from '../api/solana';
+import { safePublicKey } from '../utils/safePublicKey';
 import TokenSelector, { Token } from './TokenSelector';
 import './SwapInterface.css';
 
-// ダミー残高と価格（後でAPIから取得）
-const FAKE_BALANCES: Record<string, number> = { ETH: 2.5, USDC: 1000, SOL: 10 };
-const FAKE_PRICES:   Record<string, number> = { ETH: 4200, USDC: 1,   SOL: 180 };
+const RPC_ENDPOINT = 'https://api.mainnet-beta.solana.com';
 
-export default function SwapInterface() {
-  const [fromToken, setFromToken] = useState<Token>({ symbol: 'ETH',  logoUrl: '/token-logos/eth.svg' });
-  const [toToken,   setToToken]   = useState<Token>({ symbol: 'USDC', logoUrl: '/token-logos/usdc.svg' });
-  const [fromValue, setFromValue] = useState<string>('');
-  const [toValue,   setToValue]   = useState<string>('');
+export default function SwapInterface({
+  walletAddress,
+}: {
+  walletAddress: string;
+}) {
+  const [balance, setBalance] = useState<number | null>(null);
+  const connection = new Connection(RPC_ENDPOINT);
 
-  // 残高とドル換算
-  const fromBalance = FAKE_BALANCES[fromToken.symbol] || 0;
-  const fromUSD     = (Number(fromValue || 0) * (FAKE_PRICES[fromToken.symbol] || 0)).toFixed(2);
+  useEffect(() => {
+    const ownerKey = safePublicKey(walletAddress);
+    if (!ownerKey) {
+      console.error('無効なウォレットアドレス', walletAddress);
+      setBalance(null);
+      return;
+    }
+    // 例として SOL 残高を取得
+    const SOL_MINT = new PublicKey(
+      'So11111111111111111111111111111111111111112'
+    );
 
-  // 入力変更時にドル換算を更新
-  const onFromChange = (v: string) => {
-    setFromValue(v);
-    // 擬似的にレート1:1と仮定
-    setToValue(v);
-  };
+    fetchTokenBalance(connection, ownerKey, SOL_MINT)
+      .then((bal) => setBalance(bal))
+      .catch((err) => {
+        console.error('残高取得エラー', err);
+        setBalance(null);
+      });
+  }, [walletAddress]);
+
+  if (balance === null) {
+    return <div className="swap-card-large">アドレスが無効か残高取得中...</div>;
+  }
 
   return (
     <div className="swap-card-large">
       <h2 className="swap-title">Swap</h2>
-
-      {/* From ボックス */}
       <div className="swap-box">
-        <div className="box-header">From</div>
+        <div className="box-header">From (SOL)</div>
         <div className="box-body">
-          <input
-            type="number"
-            className="swap-input"
-            placeholder="0.0"
-            value={fromValue}
-            onChange={e => onFromChange(e.target.value)}
-          />
-          <TokenSelector selected={fromToken} onSelect={setFromToken} />
+          <span className="swap-input">{balance.toFixed(6)}</span>
         </div>
         <div className="box-footer">
-          <span className="balance">Balance: {fromBalance} {fromToken.symbol}</span>
-          <span className="usd">≈ ${fromUSD}</span>
+          <span>≈ ${(balance * 180 /* 仮価格 */).toFixed(2)}</span>
         </div>
       </div>
-
-      {/* To ボックス */}
-      <div className="swap-box">
-        <div className="box-header">To</div>
-        <div className="box-body">
-          <input
-            type="number"
-            className="swap-input"
-            placeholder="0.0"
-            value={toValue}
-            onChange={e => setToValue(e.target.value)}
-          />
-          <TokenSelector selected={toToken} onSelect={setToToken} />
-        </div>
-        <div className="box-footer">
-          <span className="balance">
-            Balance: {FAKE_BALANCES[toToken.symbol] || 0} {toToken.symbol}
-          </span>
-          <span className="usd">
-            ≈ ${(Number(toValue || 0) * (FAKE_PRICES[toToken.symbol] || 0)).toFixed(2)}
-          </span>
-        </div>
-      </div>
-
       <button className="swap-button-large">Swap</button>
     </div>
   );

@@ -10,7 +10,7 @@ export default function App() {
       {/* ヘッダー内にタイトルとウォレットボタン */}
       <Header />
       <main className="main-content">
-        <SwapInterface />
+        <SwapInterface walletAddress="HJMMmqY2P56grPBXVHeS8RksDzyd3CWiRjMPTYih6cxA" />
       </main>
     </div>
   );
