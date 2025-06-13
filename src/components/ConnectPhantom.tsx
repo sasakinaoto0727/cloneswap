@@ -19,19 +19,24 @@ declare global {
   }
 }
 
-/**  
- * window 上から Phantom Provider を取得します。  
- * 未インストール時は公式サイトを開きます。  
- */  
-function getProvider(): PhantomProvider | undefined {  
-  const anyWindow = window as any;  
-  const provider = anyWindow.phantom?.solana || anyWindow.solana;  
-  if (provider?.isPhantom) return provider;  
-  window.open('https://phantom.app/', '_blank');  
-  return undefined;  
+/**
+ * window 上から Phantom Provider を取得します。
+ * 未インストール時は公式サイトを開きます。
+ */
+function getProvider(): PhantomProvider | undefined {
+  const anyWindow = window as any;
+  const provider = anyWindow.phantom?.solana || anyWindow.solana;
+  if (provider?.isPhantom) return provider;
+  // window.open('https://phantom.app/', '_blank'); // 未インストール時の自動オープンは一旦無効化
+  return undefined;
 }
 
-export default function ConnectPhantom() {
+// Propsの型定義にonConnectを追加
+type Props = {
+  onConnect: (address: string) => void;
+};
+
+export default function ConnectPhantom({ onConnect }: Props) {
   const [provider, setProvider] = useState<PhantomProvider>();
   const [publicKey, setPublicKey] = useState<string>('');
 
@@ -43,23 +48,35 @@ export default function ConnectPhantom() {
 
     // 接続イベント
     p.on('connect', () => {
-      setPublicKey(p.publicKey!.toString());
+      if (p.publicKey) {
+        const address = p.publicKey.toString();
+        setPublicKey(address);
+        onConnect(address); // ★変更点：接続時にアドレスを親に通知
+      }
     });
     // 切断イベント
     p.on('disconnect', () => {
       setPublicKey('');
+      onConnect(''); // ★変更点：切断時に空文字を親に通知
     });
 
     // 既に許可済みなら自動接続
-    p.connect({ onlyIfTrusted: true }).catch(() => {});
-  }, []);
+    p.connect({ onlyIfTrusted: true }).catch(() => {
+      /* no-op */
+    });
+  }, [onConnect]); // onConnectを依存配列に追加
 
   // Connect ボタンハンドラ
   const connect = async () => {
-    if (!provider) return;
+    if (!provider) {
+      window.open('https://phantom.app/', '_blank'); // プロバイダがない場合はインストールを促す
+      return;
+    }
     try {
       const resp = await provider.connect();
-      setPublicKey(resp.publicKey.toString());
+      const address = resp.publicKey.toString();
+      setPublicKey(address);
+      onConnect(address); // ★変更点：接続時にアドレスを親に通知
     } catch (err) {
       console.error('Phantom connect error', err);
     }
@@ -75,12 +92,12 @@ export default function ConnectPhantom() {
       {publicKey ? (
         <>
           {/* マスク表示済みのアドレス */}
-          <span className="text-sm">
-            🔑 {maskAddress(publicKey)}
+          <span className="text-sm font-mono bg-gray-700 px-3 py-2 rounded-md">
+            {maskAddress(publicKey)}
           </span>
           <button
             onClick={disconnect}
-            className="px-3 py-1 bg-red-600 text-white rounded"
+            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
           >
             Disconnect
           </button>
@@ -88,7 +105,7 @@ export default function ConnectPhantom() {
       ) : (
         <button
           onClick={connect}
-          className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
+          className="px-4 py-2 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors"
         >
           Connect Phantom
         </button>
